@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Dashboard — EduGrade AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+<nav class="nav"><div class="nav-inner">
+  <a href="/" class="logo"><div class="logo-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 1.5L11.5 6.5H16L12.5 9.5L14 15L9 12L4 15L5.5 9.5L2 6.5H6.5L9 1.5Z" fill="#1B8F6A"/></svg></div><div><div class="logo-name">EduGrade AI</div><div class="logo-sub">Prof. Rihab Saidi</div></div></a>
+  <div class="nav-links">
+    <span id="navName" style="font-size:13px;color:var(--ink3)"></span>
+    <button class="btn btn-ghost" onclick="logout()">Sign out</button>
+  </div>
+</div></nav>
+
+<div class="dash-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-user">
+      <div class="sidebar-user-name" id="sidebarName">—</div>
+      <div class="sidebar-user-year" id="sidebarYear">—</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Navigation</div>
+      <button class="sidebar-link active" onclick="showPage('overview')" id="nav-overview">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+        Overview
+      </button>
+      <button class="sidebar-link" onclick="showPage('submit')" id="nav-submit">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 10V2M8 2L5 5M8 2L11 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Submit TP
+      </button>
+      <button class="sidebar-link" onclick="showPage('grades')" id="nav-grades">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        My Grades
+      </button>
+      <button class="sidebar-link" onclick="showPage('profile')" id="nav-profile">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Profile
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+
+    <!-- OVERVIEW -->
+    <div id="page-overview">
+      <div class="page-title" id="welcomeTitle">Welcome back</div>
+      <div class="page-sub" id="welcomeSub">Here's your progress summary.</div>
+      <div class="metric-grid" id="metricGrid"></div>
+      <div class="card">
+        <div class="card-title">Your TPs</div>
+        <div class="tp-grid" id="overviewTpGrid"></div>
+      </div>
+    </div>
+
+    <!-- SUBMIT -->
+    <div id="page-submit" style="display:none">
+      <div class="page-title">Submit a TP</div>
+      <div class="page-sub">Select the practical session, upload your work, and receive instant feedback.</div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:.75rem">Select TP</div>
+        <div class="tp-grid" id="submitTpGrid"></div>
+      </div>
+
+      <div class="card" id="uploadCard" style="display:none">
+        <div class="card-title">Upload your file</div>
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="fileInput" accept=".pdf,.pptx,.docx,.txt,.py,.c,.cpp,.java,.js,.md,.html,.css"/>
+          <div class="drop-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M11 13V3M11 3L7.5 6.5M11 3L14.5 6.5" stroke="#1B8F6A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14.5V17C3 18.1 3.9 19 5 19H17C18.1 19 19 18.1 19 17V14.5" stroke="#1B8F6A" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+          <div class="drop-title">Drop your file or click to browse</div>
+          <div class="drop-sub">PDF, DOCX, PPTX, Python, C/C++, HTML/CSS, JS…</div>
+        </div>
+        <div class="file-preview" id="filePreview">
+          <div class="ficon" id="fIcon">PDF</div>
+          <div style="flex:1;min-width:0"><div class="fname" id="fName">—</div><div class="fsize" id="fSize">—</div></div>
+          <button class="fremove" onclick="removeFile()">✕</button>
+        </div>
+
+        <div style="margin-top:1rem">
+          <div class="card-title" style="margin-bottom:.5rem">Feedback language</div>
+          <div class="lang-tabs">
+            <button class="lang-tab" onclick="setLang('auto',this)">Auto-detect</button>
+            <button class="lang-tab active" onclick="setLang('fr',this)">Français</button>
+            <button class="lang-tab" onclick="setLang('en',this)">English</button>
+            <button class="lang-tab" onclick="setLang('ar',this)">العربية</button>
+          </div>
+        </div>
+
+        <div style="margin-top:.75rem">
+          <label style="font-size:12px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:6px">Optional note</label>
+          <textarea id="studentNote" placeholder="Any additional context for the evaluator…" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:13.5px;color:var(--ink);resize:vertical;min-height:72px"></textarea>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%;padding:13px;margin-top:1rem;font-size:15px" id="submitBtn" onclick="submitTP()">
+          Evaluate my submission →
+        </button>
+        <div class="form-error" id="submitErr"></div>
+      </div>
+
+      <div class="loading-box" id="loadingBox">
+        <div class="spinner"></div>
+        <div style="font-size:14px;font-weight:500;color:var(--ink)">Analyzing your submission…</div>
+        <div class="loading-step" id="loadingStep">Reading document</div>
+      </div>
+
+      <div class="result-panel" id="resultPanel">
+        <div class="result-header-bar">
+          <div><div class="label">Evaluation complete</div><div class="title" id="resTitle">—</div></div>
+          <div class="grade-badge"><div class="num" id="gradeNum">—</div><div class="denom">/ 20</div></div>
+        </div>
+        <div class="result-body-inner" id="resultBodyInner"></div>
+      </div>
+    </div>
+
+    <!-- GRADES -->
+    <div id="page-grades" style="display:none">
+      <div class="page-title">My Grades</div>
+      <div class="page-sub">Full history of your submitted TPs and received feedback.</div>
+      <div id="gradesContent"></div>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="page-profile" style="display:none">
+      <div class="page-title">Profile</div>
+      <div class="page-sub">Your account information.</div>
+      <div class="card" style="max-width:480px">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:1.5rem">
+          <div style="width:56px;height:56px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:#fff" id="profileAvatar">—</div>
+          <div><div style="font-family:'Lora',serif;font-size:20px;color:var(--ink)" id="profileName">—</div><div style="font-size:13px;color:var(--green);margin-top:2px" id="profileYear">—</div></div>
+        </div>
+        <table style="width:100%;font-size:13.5px">
+          <tr><td style="padding:8px 0;color:var(--ink3);width:100px">Email</td><td id="profileEmail" style="color:var(--ink)">—</td></tr>
+          <tr><td style="padding:8px 0;color:var(--ink3)">Group</td><td id="profileGroup" style="color:var(--ink)">—</td></tr>
+          <tr><td style="padding:8px 0;color:var(--ink3)">Account</td><td style="color:var(--green)">Active</td></tr>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- CHATBOT -->
+<button class="chat-fab" onclick="toggleChat()">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="white"/></svg>
+</button>
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div><div class="chat-head-title">AI Assistant</div><div class="chat-head-sub">Ask me anything about your courses</div></div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-msg bot">Bonjour ! 👋 Je suis votre assistant de cours. Posez-moi toute question sur vos TPs, vos notes, ou vos cours de programmation.</div>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chatInput" placeholder="Ask a question…" onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button class="chat-send" onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──
+const TP_DATA = {
+  1: [
+    {key:'l1_tp1', num:'TP 1', name:'Arrays & Tables', desc:'1D arrays, traversal, basic sorting'},
+    {key:'l1_tp2', num:'TP 2', name:'Pointers & Memory', desc:'Address operators, dynamic allocation'},
+    {key:'l1_tp3', num:'TP 3', name:'String Manipulation', desc:'Char arrays, string functions, parsing'},
+    {key:'l1_tp4', num:'TP 4', name:'Functions & Procedures', desc:'Parameters, return values, recursion'},
+  ],
+  2: [
+    {key:'l2_tp1', num:'TP 1', name:'Web Ecosystem & Technologies', desc:'Ch.1 — HTML/CSS/JS roles, HTTP, browsers'},
+    {key:'l2_tp2', num:'TP 2', name:'HTML5 & CSS3', desc:'Ch.2–3 — Semantic markup, layouts, styling'},
+    {key:'l2_tp3', num:'TP 3', name:'CSS Animations & JavaScript', desc:'Ch.6–7 — Keyframes, transitions, DOM'},
+  ]
+};
+
+let user = null;
+let token = null;
+let allGrades = [];
+let selectedTpKey = null;
+let selectedLang = 'fr';
+let currentFile = null;
+let chatHistory = [];
+const STEPS = ['Reading document','Identifying concepts','Evaluating methodology','Checking accuracy','Preparing feedback'];
+let stepIdx = 0, stepTimer;
+
+// ── INIT ──
+(async function init() {
+  token = localStorage.getItem('token');
+  if (!token) { window.location.href = '/login.html'; return; }
+  const storedUser = localStorage.getItem('user');
+  user = storedUser ? JSON.parse(storedUser) : null;
+  if (!user) { window.location.href = '/login.html'; return; }
+
+  document.getElementById('navName').textContent = user.name;
+  document.getElementById('sidebarName').textContent = user.name;
+  document.getElementById('sidebarYear').textContent = `L${user.year} — ${user.year===1?'Atelier de Programmation':'Web Programming'}`;
+  document.getElementById('welcomeTitle').textContent = `Welcome, ${user.name.split(' ')[0]} 👋`;
+  document.getElementById('profileAvatar').textContent = user.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('profileName').textContent = user.name;
+  document.getElementById('profileEmail').textContent = user.email;
+  document.getElementById('profileGroup').textContent = user.group || 'Not set';
+  document.getElementById('profileYear').textContent = `L${user.year} — ${user.year===1?'Atelier de Programmation':'Technologies & Web Programming'}`;
+
+  await loadGrades();
+  renderOverview();
+  renderSubmitTpGrid();
+})();
+
+async function loadGrades() {
+  try {
+    const r = await fetch('/api/grades', { headers: { Authorization: 'Bearer ' + token } });
+    allGrades = await r.json();
+  } catch { allGrades = []; }
+}
+
+// ── PAGES ──
+function showPage(name) {
+  ['overview','submit','grades','profile'].forEach(p => {
+    document.getElementById('page-'+p).style.display = p===name ? 'block' : 'none';
+    const nav = document.getElementById('nav-'+p);
+    if (nav) nav.classList.toggle('active', p===name);
+  });
+  if (name==='grades') renderGradesPage();
+}
+
+// ── OVERVIEW ──
+function renderOverview() {
+  const tps = TP_DATA[user.year];
+  const done = allGrades.filter(g => tps.map(t=>t.key).includes(g.tpKey));
+  const avg = done.length ? (done.reduce((s,g)=>s+(g.score||0),0)/done.length).toFixed(1) : '—';
+  const best = done.length ? Math.max(...done.map(g=>g.score||0)) : '—';
+
+  document.getElementById('welcomeSub').textContent = `You have completed ${done.length} of ${tps.length} TPs.`;
+
+  document.getElementById('metricGrid').innerHTML = `
+    <div class="metric"><div class="metric-val">${done.length}/${tps.length}</div><div class="metric-lbl">TPs completed</div></div>
+    <div class="metric"><div class="metric-val">${avg}</div><div class="metric-lbl">Average /20</div></div>
+    <div class="metric"><div class="metric-val">${best}</div><div class="metric-lbl">Best score</div></div>
+    <div class="metric"><div class="metric-val">${tps.length - done.length}</div><div class="metric-lbl">Remaining</div></div>
+  `;
+
+  document.getElementById('overviewTpGrid').innerHTML = tps.map(tp => {
+    const g = allGrades.find(x => x.tpKey === tp.key);
+    const score = g ? g.score : null;
+    const pass = score !== null && score >= 10;
+    return `<div class="tp-submission-card ${g?'done':''}">
+      <div class="tp-card-head">
+        <div><div style="font-size:10px;font-weight:600;color:var(--green);letter-spacing:.5px;text-transform:uppercase">${tp.num}</div><div class="tp-name-card">${tp.name}</div></div>
+        <div class="${score!==null?'score-big'+(pass?'':' fail'):'score-big pending'}">${score!==null?score:'—'}</div>
+      </div>
+      <div class="tp-meta">${g?'Submitted '+new Date(g.submittedAt).toLocaleDateString('fr-TN'):'Not submitted'}</div>
+      ${!g?`<button class="btn btn-outline" style="margin-top:10px;font-size:12.5px;padding:6px 12px" onclick="showPage('submit')">Submit →</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── SUBMIT ──
+function renderSubmitTpGrid() {
+  const tps = TP_DATA[user.year];
+  document.getElementById('submitTpGrid').innerHTML = tps.map(tp => {
+    const done = allGrades.find(g=>g.tpKey===tp.key);
+    return `<div class="tp-submission-card ${done?'done':''}" onclick="${done?'':'selectTp(\''+tp.key+'\')'}" style="${done?'opacity:.7;cursor:default':'cursor:pointer'}">
+      <div class="tp-card-head">
+        <span class="tp-badge ${done?'':'pending'}">${done?'Submitted':'Pending'}</span>
+        ${done?`<span style="font-family:'Lora',serif;font-size:20px;color:var(--green-dark)">${done.score}/20</span>`:''}
+      </div>
+      <div class="tp-name-card">${tp.num} — ${tp.name}</div>
+      <div class="tp-meta">${tp.desc}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectTp(key) {
+  selectedTpKey = key;
+  document.getElementById('uploadCard').style.display = 'block';
+  document.getElementById('resultPanel').classList.remove('show');
+  document.getElementById('loadingBox').classList.remove('show');
+  document.getElementById('submitErr').classList.remove('show');
+  document.querySelectorAll('#submitTpGrid .tp-submission-card').forEach((c,i) => {
+    c.style.outline = TP_DATA[user.year][i].key===key ? '2px solid var(--green)' : 'none';
+  });
+  document.getElementById('uploadCard').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// FILE
+const dz = document.getElementById('dropZone');
+const fi = document.getElementById('fileInput');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over');if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0])});
+fi.addEventListener('change',()=>{if(fi.files[0])loadFile(fi.files[0])});
+
+function loadFile(f) {
+  currentFile = f;
+  const ext = f.name.split('.').pop().toLowerCase();
+  const icon = document.getElementById('fIcon');
+  icon.textContent = ext.toUpperCase().slice(0,4);
+  icon.className = 'ficon '+(['pdf','pptx','docx'].includes(ext)?ext:'code');
+  document.getElementById('fName').textContent = f.name;
+  document.getElementById('fSize').textContent = fmtSize(f.size);
+  document.getElementById('filePreview').classList.add('show');
+}
+function removeFile(){currentFile=null;document.getElementById('filePreview').classList.remove('show');fi.value=''}
+function fmtSize(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB'}
+function setLang(l,btn){selectedLang=l;document.querySelectorAll('.lang-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+
+async function submitTP() {
+  const err = document.getElementById('submitErr');
+  err.classList.remove('show');
+  if (!selectedTpKey) { err.textContent='Please select a TP.'; err.classList.add('show'); return; }
+  if (!currentFile) { err.textContent='Please upload your file.'; err.classList.add('show'); return; }
+
+  const tp = TP_DATA[user.year].find(t=>t.key===selectedTpKey);
+  const note = document.getElementById('studentNote').value.trim();
+
+  document.getElementById('uploadCard').style.display='none';
+  document.getElementById('loadingBox').classList.add('show');
+  document.getElementById('resultPanel').classList.remove('show');
+  startSteps();
+
+  const fd = new FormData();
+  fd.append('file', currentFile);
+  fd.append('tpKey', selectedTpKey);
+  fd.append('tpName', tp.num+' — '+tp.name);
+  fd.append('year', user.year);
+  fd.append('lang', selectedLang);
+  if (note) fd.append('note', note);
+
+  try {
+    const r = await fetch('/api/evaluate', { method:'POST', headers:{ Authorization:'Bearer '+token }, body:fd });
+    stopSteps();
+    const data = await r.json();
+    document.getElementById('loadingBox').classList.remove('show');
+    if (!r.ok) { err.textContent=data.error||'Evaluation failed.'; err.classList.add('show'); document.getElementById('uploadCard').style.display='block'; return; }
+    renderResult(data.grade);
+    await loadGrades();
+    renderOverview();
+    renderSubmitTpGrid();
+    showToast('TP submitted and evaluated!','success');
+  } catch(e) {
+    stopSteps();
+    document.getElementById('loadingBox').classList.remove('show');
+    document.getElementById('uploadCard').style.display='block';
+    err.textContent='Server error: '+e.message; err.classList.add('show');
+  }
+}
+
+function startSteps(){stepIdx=0;setStep();stepTimer=setInterval(()=>{stepIdx=(stepIdx+1)%STEPS.length;setStep()},2200)}
+function stopSteps(){clearInterval(stepTimer)}
+function setStep(){document.getElementById('loadingStep').textContent=STEPS[stepIdx]+'…'}
+
+function renderResult(grade) {
+  const text = grade.feedback;
+  const gradeMatch = text.match(/FINAL:\s*(\d+(?:[.,]\d+)?)\s*\/\s*20/i);
+  const score = gradeMatch ? gradeMatch[1].replace(',','.') : grade.score;
+  document.getElementById('gradeNum').textContent = score || '—';
+  document.getElementById('resTitle').textContent = grade.tpName;
+
+  const SECS=[{key:'SUMMARY',label:'Summary',icon:'◈'},{key:'STRENGTHS',label:'Strengths',icon:'✦'},{key:'WEAKNESSES',label:'Weaknesses',icon:'◆'},{key:'DETAILED FEEDBACK',label:'Detailed Feedback',icon:'◉'},{key:'GRADING BREAKDOWN',label:'Grading Breakdown',icon:'▣'},{key:'FINAL GRADE',label:'Final Grade',icon:'★'}];
+  let html='';
+  SECS.forEach((sec,i)=>{
+    const start=text.indexOf('### '+sec.key);
+    if(start===-1)return;
+    const cStart=text.indexOf('\n',start)+1;
+    let cEnd=text.length;
+    for(let j=i+1;j<SECS.length;j++){const nxt=text.indexOf('### '+SECS[j].key);if(nxt!==-1&&nxt<cEnd)cEnd=nxt;}
+    const content=text.slice(cStart,cEnd).trim();
+    if(!content)return;
+    html+=`<div class="rsec"><div class="rsec-head">${sec.icon} ${sec.label}</div>`;
+    if(sec.key==='GRADING BREAKDOWN'){
+      html+='<div class="score-rows">';
+      content.split('\n').filter(l=>l.includes('|')).forEach(line=>{
+        const parts=line.split('|').map(p=>p.trim()).filter(Boolean);
+        if(parts.length>=3){const crit=parts[0],max=parseFloat(parts[1])||5,awd=parseFloat(parts[2]);
+          if(!isNaN(awd)){const pct=Math.min(100,(awd/max)*100);const just=parts[3]||'';
+            html+=`<div class="score-row"><div class="sc-crit">${esc(crit)}${just?'<div class="sc-just">'+esc(just)+'</div>':''}</div><div class="sc-bar-wrap"><div class="sc-bar" data-pct="${pct}"></div></div><div class="sc-val">${awd}/${max}</div></div>`;
+          }}});
+      html+='</div>';
+    } else { html+=`<div class="rsec-text">${esc(content)}</div>`; }
+    html+='</div>';
+  });
+  if(!html)html=`<div class="rsec"><div class="rsec-text">${esc(text)}</div></div>`;
+  document.getElementById('resultBodyInner').innerHTML=html;
+  document.getElementById('resultPanel').classList.add('show');
+  requestAnimationFrame(()=>{
+    document.querySelectorAll('.sc-bar[data-pct]').forEach(bar=>{
+      setTimeout(()=>{bar.style.width=bar.getAttribute('data-pct')+'%'},100);
+    });
+  });
+}
+
+// ── GRADES PAGE ──
+function renderGradesPage() {
+  const tps = TP_DATA[user.year];
+  if (!allGrades.length) {
+    document.getElementById('gradesContent').innerHTML='<div class="card" style="text-align:center;padding:3rem;color:var(--ink3)">No submissions yet. <a href="#" onclick="showPage(\'submit\')" style="color:var(--green)">Submit your first TP →</a></div>';
+    return;
+  }
+  const done = allGrades.filter(g=>tps.map(t=>t.key).includes(g.tpKey));
+  const avg = done.length?(done.reduce((s,g)=>s+(g.score||0),0)/done.length).toFixed(2):'—';
+  let html = `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem"><div class="card-title" style="margin-bottom:0">Grade summary</div><div style="font-family:'Lora',serif;font-size:22px;color:var(--green-dark)">${avg}/20 avg</div></div>`;
+  done.forEach(g=>{
+    const pass = (g.score||0)>=10;
+    html+=`<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1"><div style="font-size:14px;font-weight:500;color:var(--ink)">${g.tpName}</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">${new Date(g.submittedAt).toLocaleDateString('fr-TN')} · ${g.fileName}</div></div>
+      <div style="font-family:'Lora',serif;font-size:22px;color:${pass?'var(--green-dark)':'#C0392B'}">${g.score}/20</div>
+      <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="showFeedback('${g.tpKey}')">View feedback</button>
+    </div>`;
+  });
+  html+='</div>';
+
+  // Feedback panels
+  done.forEach(g=>{
+    html+=`<div id="fb_${g.tpKey}" style="display:none">
+      <div class="result-header-bar"><div><div class="label">Evaluation</div><div class="title">${g.tpName}</div></div><div class="grade-badge"><div class="num">${g.score}</div><div class="denom">/ 20</div></div></div>
+      <div class="result-body-inner">${renderFeedbackHtml(g.feedback)}</div>
+    </div>`;
+  });
+  document.getElementById('gradesContent').innerHTML=html;
+}
+
+function showFeedback(key) {
+  document.querySelectorAll('[id^=fb_]').forEach(el=>el.style.display='none');
+  const el=document.getElementById('fb_'+key);
+  if(el){el.style.display='block';el.scrollIntoView({behavior:'smooth',block:'start'});}
+  requestAnimationFrame(()=>{el.querySelectorAll('.sc-bar[data-pct]').forEach(b=>{setTimeout(()=>{b.style.width=b.getAttribute('data-pct')+'%'},100)})});
+}
+
+function renderFeedbackHtml(text){
+  const SECS=[{key:'SUMMARY',label:'Summary',icon:'◈'},{key:'STRENGTHS',label:'Strengths',icon:'✦'},{key:'WEAKNESSES',label:'Weaknesses',icon:'◆'},{key:'DETAILED FEEDBACK',label:'Detailed Feedback',icon:'◉'},{key:'GRADING BREAKDOWN',label:'Grading Breakdown',icon:'▣'},{key:'FINAL GRADE',label:'Final Grade',icon:'★'}];
+  let html='';
+  SECS.forEach((sec,i)=>{
+    const start=text.indexOf('### '+sec.key);if(start===-1)return;
+    const cStart=text.indexOf('\n',start)+1;let cEnd=text.length;
+    for(let j=i+1;j<SECS.length;j++){const nxt=text.indexOf('### '+SECS[j].key);if(nxt!==-1&&nxt<cEnd)cEnd=nxt;}
+    const content=text.slice(cStart,cEnd).trim();if(!content)return;
+    html+=`<div class="rsec"><div class="rsec-head">${sec.icon} ${sec.label}</div>`;
+    if(sec.key==='GRADING BREAKDOWN'){html+='<div class="score-rows">';content.split('\n').filter(l=>l.includes('|')).forEach(line=>{const parts=line.split('|').map(p=>p.trim()).filter(Boolean);if(parts.length>=3){const crit=parts[0],max=parseFloat(parts[1])||5,awd=parseFloat(parts[2]);if(!isNaN(awd)){const pct=Math.min(100,(awd/max)*100);const just=parts[3]||'';html+=`<div class="score-row"><div class="sc-crit">${esc(crit)}${just?'<div class="sc-just">'+esc(just)+'</div>':''}</div><div class="sc-bar-wrap"><div class="sc-bar" data-pct="${pct}"></div></div><div class="sc-val">${awd}/${max}</div></div>`;}}});html+='</div>';}
+    else{html+=`<div class="rsec-text">${esc(content)}</div>`;}
+    html+='</div>';
+  });
+  return html||`<div class="rsec-text">${esc(text)}</div>`;
+}
+
+// ── CHAT ──
+function toggleChat(){document.getElementById('chatPanel').classList.toggle('open')}
+async function sendChat(){
+  const input=document.getElementById('chatInput');
+  const msg=input.value.trim();if(!msg)return;
+  input.value='';
+  const msgs=document.getElementById('chatMessages');
+  msgs.innerHTML+=`<div class="chat-msg user">${esc(msg)}</div>`;
+  msgs.innerHTML+=`<div class="chat-msg typing" id="typingDot">Thinking…</div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+  chatHistory.push({role:'user',content:msg});
+  try{
+    const r=await fetch('/api/chat',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:chatHistory})});
+    const data=await r.json();
+    document.getElementById('typingDot')?.remove();
+    const reply=data.reply||'Sorry, I could not process that.';
+    msgs.innerHTML+=`<div class="chat-msg bot">${esc(reply)}</div>`;
+    chatHistory.push({role:'assistant',content:reply});
+    msgs.scrollTop=msgs.scrollHeight;
+  }catch(e){document.getElementById('typingDot')?.remove();msgs.innerHTML+=`<div class="chat-msg bot">Connection error. Please try again.</div>`;}
+}
+document.getElementById('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendChat()});
+
+// ── HELPERS ──
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function logout(){localStorage.removeItem('token');localStorage.removeItem('user');window.location.href='/login.html'}
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');setTimeout(()=>t.classList.remove('show'),3500)}
+</script>
+</body></html>

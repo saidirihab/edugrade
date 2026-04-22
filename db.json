@@ -1,0 +1,15 @@
+{
+  "users": [
+    {
+      "id": "1776887674757",
+      "name": "Rihab",
+      "email": "rihab.saidi@enig.rnu.tn",
+      "password": "$2b$10$fETO0t23XnVELRTCOUKmCe9DwwGO/UnPdvj3hJN0Xp78l4pdo3V56",
+      "year": 1,
+      "group": "TP2",
+      "createdAt": "2026-04-22T19:54:34.760Z"
+    }
+  ],
+  "grades": [],
+  "sessions": []
+}

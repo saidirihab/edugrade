@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Create Account — EduGrade AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+<nav class="nav"><div class="nav-inner">
+  <a href="/" class="logo"><div class="logo-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 1.5L11.5 6.5H16L12.5 9.5L14 15L9 12L4 15L5.5 9.5L2 6.5H6.5L9 1.5Z" fill="#1B8F6A"/></svg></div><div><div class="logo-name">EduGrade AI</div><div class="logo-sub">Prof. Rihab Saidi</div></div></a>
+  <div class="nav-links"><a href="/login.html" class="btn btn-ghost">Sign in</a></div>
+</div></nav>
+
+<div class="auth-wrap"><div class="auth-main">
+  <div class="auth-card">
+    <div class="auth-title">Create your account</div>
+    <div class="auth-sub">Register to submit your TPs and receive AI-powered feedback from Prof. Rihab Saidi's courses.</div>
+    <div class="form-error" id="errBox"></div>
+    <div class="two-fields">
+      <div class="field"><label>First & last name</label><input type="text" id="name" placeholder="Fatima Ben Ali"/></div>
+      <div class="field"><label>Email address</label><input type="email" id="email" placeholder="you@university.tn"/></div>
+    </div>
+    <div class="two-fields">
+      <div class="field"><label>Year</label>
+        <select id="year">
+          <option value="1">L1 — 1st Year (Atelier Prog.)</option>
+          <option value="2">L2 — 2nd Year (Web Programming)</option>
+        </select>
+      </div>
+      <div class="field"><label>Group (optional)</label><input type="text" id="group" placeholder="e.g. G1, TP-A"/></div>
+    </div>
+    <div class="two-fields">
+      <div class="field"><label>Password</label><input type="password" id="password" placeholder="Min. 8 characters"/></div>
+      <div class="field"><label>Confirm password</label><input type="password" id="password2" placeholder="Repeat password"/></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:12px;margin-top:4px;font-size:15px" onclick="doRegister()">Create my account</button>
+    <div class="auth-footer">Already have an account? <a href="/login.html">Sign in</a></div>
+  </div>
+</div></div>
+
+<script>
+async function doRegister() {
+  const name=document.getElementById('name').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const year=document.getElementById('year').value;
+  const group=document.getElementById('group').value.trim();
+  const password=document.getElementById('password').value;
+  const password2=document.getElementById('password2').value;
+  const err=document.getElementById('errBox');
+  err.classList.remove('show');
+  if(!name||!email||!password) { err.textContent='Please fill in all required fields.'; err.classList.add('show'); return; }
+  if(password.length<8) { err.textContent='Password must be at least 8 characters.'; err.classList.add('show'); return; }
+  if(password!==password2) { err.textContent='Passwords do not match.'; err.classList.add('show'); return; }
+  const btn=document.querySelector('.btn-primary');
+  btn.disabled=true; btn.textContent='Creating account…';
+  try {
+    const r=await fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password,year,group})});
+    const data=await r.json();
+    if(!r.ok) { err.textContent=data.error||'Registration failed.'; err.classList.add('show'); btn.disabled=false; btn.textContent='Create my account'; return; }
+    localStorage.setItem('token',data.token);
+    localStorage.setItem('user',JSON.stringify(data.user));
+    window.location.href='/dashboard.html';
+  } catch(e) { err.textContent='Connection error.'; err.classList.add('show'); btn.disabled=false; btn.textContent='Create my account'; }
+}
+document.addEventListener('keydown', e => { if(e.key==='Enter') doRegister(); });
+if(localStorage.getItem('token')) window.location.href='/dashboard.html';
+</script>
+</body></html>
